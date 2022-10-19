@@ -1,5 +1,6 @@
 <script setup>
 import { ref, watch, onMounted } from "vue";
+import { useGlobalStore } from "@/stores/global";
 import axios from "axios";
 
 const inputField = ref();
@@ -11,8 +12,11 @@ const word = ref("");
 const badWord = ref("");
 const searching = ref(false);
 
+const store = useGlobalStore();
+
 onMounted(() => {
   inputField.value.focus();
+  console.log(store.darkMode);
 });
 
 watch(inputValue, async () => {
@@ -115,11 +119,17 @@ const focusInput = () => {
 </script>
 
 <template>
-  <main>
+  <div
+    @click="store.darkMode = !store.darkMode"
+    :class="{ themeButton: true, dark: store.darkMode }"
+  >
+    <i v-if="store.darkMode" class="fa-solid fa-lightbulb-on"></i>
+    <i v-else class="fa-solid fa-lightbulb-slash"></i>
+  </div>
+  <main :class="{ dark: store.darkMode }">
     <form @submit="handleSearch">
       <div @click="focusInput" class="search-box">
         <i v-if="!searching" class="fa-light fa-magnifying-glass"></i>
-        <i v-else class="fa-light fa-gear fa-spin"></i>
         <input
           v-model="inputValue"
           ref="inputField"
@@ -133,7 +143,11 @@ const focusInput = () => {
         ></i>
       </div>
       <div
-        :class="{ 'suggestions-container': true, open: wordSuggestions.length }"
+        :class="{
+          'suggestions-container': true,
+          open: wordSuggestions.length,
+          dark: store.darkMode,
+        }"
       >
         <span
           @click="handleSuggestion"
@@ -211,6 +225,40 @@ const focusInput = () => {
 </template>
 
 <style scoped lang="scss">
+div.themeButton {
+  position: absolute;
+  top: 50px;
+  right: 50px;
+  width: 50px;
+  height: 50px;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.555);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.1em;
+  border-radius: 10px;
+  transition: 0.2s ease-in-out;
+
+  & i {
+    margin-top: 2px;
+  }
+
+  &:hover {
+    cursor: pointer;
+    background-color: rgb(0, 0, 0);
+  }
+
+  &.dark {
+    color: black;
+    background-color: rgba(255, 255, 255, 0.568);
+
+    &:hover {
+      background-color: white;
+    }
+  }
+}
+
 main {
   height: 100vh;
   display: flex;
@@ -218,6 +266,11 @@ main {
   justify-content: center;
   align-items: center;
   padding: 0 10px;
+  transition: background-color 0.2s ease-in-out;
+
+  &.dark {
+    background-color: #3f4155;
+  }
 
   @media only screen and (max-height: 750px) {
     scale: 0.8;
@@ -254,7 +307,7 @@ main {
   }
   & div.suggestions-container {
     height: 0;
-    transition: height 0.2s ease-in-out;
+    transition: height 0.2s ease-in-out, background-color 0.2s ease-in-out;
     overflow: hidden;
     max-width: 300px;
     border-radius: 10px;
@@ -264,6 +317,11 @@ main {
     background-color: white;
     font-size: 1.1em;
     padding: 0px 20px;
+
+    &.dark {
+      background-color: rgba(56, 44, 56, 0.336);
+      color: white;
+    }
 
     &.open {
       padding: 20px;

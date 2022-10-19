@@ -219,6 +219,12 @@ main {
   align-items: center;
   padding: 0 10px;
 
+  @media only screen and (max-height: 750px) {
+    scale: 0.8;
+    margin-top: -10vh;
+    height: 120vh;
+  }
+
   & div.error-container {
     background-image: linear-gradient(
       to right top,

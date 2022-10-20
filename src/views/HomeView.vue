@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch, onMounted } from "vue";
+import { ref, watch, onMounted, onBeforeMount } from "vue";
 import { useGlobalStore } from "@/stores/global";
 import axios from "axios";
 
@@ -14,9 +14,25 @@ const searching = ref(false);
 
 const store = useGlobalStore();
 
+onBeforeMount(() => {
+  if (
+    window.matchMedia &&
+    window.matchMedia("(prefers-color-scheme: dark)").matches
+  ) {
+    // dark mode
+    store.darkMode = true;
+  }
+});
+
 onMounted(() => {
   inputField.value.focus();
   console.log(store.darkMode);
+
+  window
+    .matchMedia("(prefers-color-scheme: dark)")
+    .addEventListener("change", (event) => {
+      store.darkMode = event.matches ? true : false;
+    });
 });
 
 watch(inputValue, async () => {
@@ -119,14 +135,14 @@ const focusInput = () => {
 </script>
 
 <template>
-  <div
-    @click="store.darkMode = !store.darkMode"
-    :class="{ themeButton: true, dark: store.darkMode }"
-  >
-    <i v-if="store.darkMode" class="fa-solid fa-lightbulb-on"></i>
-    <i v-else class="fa-solid fa-lightbulb-slash"></i>
-  </div>
   <main :class="{ dark: store.darkMode }">
+    <!-- <div
+      @click="store.darkMode = !store.darkMode"
+      :class="{ themeButton: true, dark: store.darkMode }"
+    >
+      <i v-if="store.darkMode" class="fa-solid fa-lightbulb-on"></i>
+      <i v-else class="fa-solid fa-lightbulb-slash"></i>
+    </div> -->
     <form @submit="handleSearch">
       <div @click="focusInput" class="search-box">
         <i v-if="!searching" class="fa-light fa-magnifying-glass"></i>
@@ -260,23 +276,25 @@ div.themeButton {
 }
 
 main {
-  height: 100vh;
+  box-sizing: border-box;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   padding: 0 10px;
   transition: background-color 0.2s ease-in-out;
+  padding: 20px 0;
 
   &.dark {
     background-color: #3f4155;
   }
 
-  @media only screen and (max-height: 750px) {
-    scale: 0.8;
-    margin-top: -10vh;
-    height: 120vh;
-  }
+  // @media only screen and (max-height: 750px) {
+  //   scale: 0.8;
+  //   margin-top: -10vh;
+  //   height: 120vh;
+  // }
 
   & div.error-container {
     background-image: linear-gradient(

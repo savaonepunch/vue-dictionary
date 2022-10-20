@@ -4,5 +4,5 @@ body {
     background-color: rgb(233, 239, 243);
     /* background-image: url('/bg.jpeg'); */
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-    overflow: hidden;
+    /* overflow: hidden; */
 }
